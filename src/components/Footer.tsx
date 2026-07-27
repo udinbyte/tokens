@@ -5,15 +5,13 @@ import { useForm } from '@formspree/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
-  Mail, 
   Send, 
-  Twitter, 
-  Github, 
-  Discord, 
-  YoutubeIcon, // 🔥 Ganti dari Youtube ke YoutubeIcon
-  Rocket,
-  CheckCircle,
-  XCircle
+  CheckCircle, 
+  XCircle,
+  Video,         // Pengganti YouTube di Lucide
+  MessageSquare, // Pengganti Discord di Lucide
+  Code,          // Pengganti GitHub di Lucide
+  Globe          // Pengganti Twitter/X di Lucide
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,11 +35,12 @@ export default function Footer() {
     { label: 'Peta Situs', href: '/sitemap' },
   ];
 
+  // Menggunakan ikon generik dari Lucide yang tersedia
   const socials = [
-    { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
-    { icon: Github, href: 'https://github.com', label: 'GitHub' },
-    { icon: Discord, href: 'https://discord.com', label: 'Discord' },
-    { icon: YoutubeIcon, href: 'https://youtube.com', label: 'YouTube' }, // 🔥 Ganti
+    { icon: Globe, href: 'https://twitter.com', label: 'Twitter' },
+    { icon: Code, href: 'https://github.com', label: 'GitHub' },
+    { icon: MessageSquare, href: 'https://discord.com', label: 'Discord' },
+    { icon: Video, href: 'https://youtube.com', label: 'YouTube' },
   ];
 
   if (state.succeeded) {
