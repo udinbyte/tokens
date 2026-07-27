@@ -10,14 +10,13 @@ import {
   Twitter, 
   Github, 
   Discord, 
-  Youtube,
+  YoutubeIcon, // 🔥 Ganti dari Youtube ke YoutubeIcon
   Rocket,
   CheckCircle,
   XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
 
 export default function Footer() {
   const [state, handleSubmit] = useForm('YOUR_FORM_ID');
@@ -42,7 +41,7 @@ export default function Footer() {
     { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
     { icon: Github, href: 'https://github.com', label: 'GitHub' },
     { icon: Discord, href: 'https://discord.com', label: 'Discord' },
-    { icon: Youtube, href: 'https://youtube.com', label: 'YouTube' },
+    { icon: YoutubeIcon, href: 'https://youtube.com', label: 'YouTube' }, // 🔥 Ganti
   ];
 
   if (state.succeeded) {
