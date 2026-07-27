@@ -46,7 +46,7 @@ export default function WalletConnector({ className }: { className?: string }) {
   // SUDAH CONNECT
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger >
         <Button
           variant="purple"
           className={cn(
