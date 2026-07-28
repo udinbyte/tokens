@@ -22,7 +22,6 @@ export default function HomeView() {
 		"ai9.png",
 		"ai10.png",
 		"ai11.png",
-		"ai8.png",
 	];
 	
 	const midPoint = Math.ceil(imageFiles.length / 2);
@@ -33,28 +32,27 @@ export default function HomeView() {
 		<section className="relative overflow-hidden pb-20 pt-[72px] min-h-screen">
 		    {/* Background Effects */}
 		    <div className="absolute inset-0 -z-10">
-		        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl" />
-		        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-600/20 rounded-full blur-3xl" />
+		        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl" />
+		        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-600/15 rounded-full blur-3xl" />
 		        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-3xl" />
 		    </div>
 		    
 		    <div className="px-4 sm:px-6 lg:px-8 py-4">
-			    <Card className="bg-background/40 backdrop-blur-xl border-white/5 rounded-2xl shadow-2xl relative overflow-hidden">
-			        {/* Animated Border Gradient */}
-			        <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-2xl blur-sm opacity-50 animate-spin-slow" />
-			        <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-2xl opacity-30 animate-pulse" />
+			    <Card className="bg-background/40 backdrop-blur-xl border border-white/5 rounded-2xl shadow-2xl relative overflow-hidden">
+			        {/* Simple Border */}
+			        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/20 via-pink-500/10 to-blue-500/20 opacity-50" />
 			        
 			        <div className="relative bg-background/60 rounded-2xl">
 					    <div className="container mx-auto">
 						    <div className="p-4 sm:p-6 lg:p-10">
 							    <div className="relative grid grid-cols-1 lg:grid-cols-2 items-center gap-8 lg:gap-12">
 								    {/* Decorative Elements */}
-								    <div className="bg-purple-500/10 -z-1 start-0 absolute top-0 w-12 h-12 animate-[spin_10s_linear_infinite] rounded-2xl rounded-br-none rounded-tl-none border border-purple-500/20"/>
-									<div className="bg-blue-500/20 -z-1 end-0 bottom-0 absolute h-14 w-14 animate-pulse rounded-full blur-sm"/>
+								    <div className="bg-purple-500/10 -z-1 start-0 absolute top-0 w-12 h-12 rounded-2xl rounded-br-none rounded-tl-none border border-purple-500/20"/>
+									<div className="bg-blue-500/20 -z-1 end-0 bottom-0 absolute h-14 w-14 rounded-full blur-sm"/>
 									
 									{/* Left Content */}
 									<div className="space-y-6 text-center lg:text-left">
-									    <Badge className="bg-gradient-to-r from-purple-500 to-blue-600 text-white font-bold text-xs rounded-md px-4 py-1.5 uppercase tracking-wider border-white/10 hover:from-purple-600 hover:to-blue-700">
+									    <Badge className="bg-gradient-to-r from-purple-500 to-blue-600 text-white font-bold text-xs rounded-md px-4 py-1.5 uppercase tracking-wider border-0 hover:from-purple-600 hover:to-blue-700">
 									        Platform Token Solana #1
 									    </Badge>
 									    
@@ -91,7 +89,7 @@ export default function HomeView() {
 									        </div>
 									    </div>
 									    
-									    {/* Additional Trust Indicators - Responsive wrap */}
+									    {/* Additional Trust Indicators */}
 									    <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 text-xs text-muted-foreground pt-1">
 									        <span className="flex items-center gap-1.5">
 									            <Award className="h-3.5 w-3.5 text-green-400 flex-shrink-0" />
@@ -111,14 +109,14 @@ export default function HomeView() {
 									        </span>
 									    </div>
 									    
-									    {/* Action Buttons - Responsive */}
+									    {/* Action Buttons */}
 									    <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-2">
-										    <Button className="rounded-full px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 h-auto">
-											    <Link href="/dashboard/create-token" className="flex items-center gap-2">
+										    <Link href="/dashboard/create-token">
+											    <Button className="rounded-full px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 h-auto flex items-center gap-2">
 											        <Rocket className="h-4 w-4 sm:h-5 sm:w-5" />
 											        Buat Token Sekarang
-											    </Link>
-										    </Button>
+											    </Button>
+										    </Link>
 										    <WalletConnector />
 										</div>
 										
