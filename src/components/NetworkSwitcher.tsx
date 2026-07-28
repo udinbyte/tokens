@@ -17,10 +17,10 @@ export default function NetworkSwitcher({ className }: { className?: string }) {
     <Select value={network} onValueChange={(v) => setNetwork(v as WalletAdapterNetwork)}>
       <SelectTrigger 
         className={cn(
-          'h-10 rounded-lg text-sm bg-gradient-to-r from-purple-400 to-blue-500 hover:from-purple-500 hover:to-blue-600 text-white border-0 shadow-lg shadow-purple-500/25',
-          'md:w-[130px] w-full',
+          'rounded-lg text-sm bg-gradient-to-r from-purple-400 to-blue-500 hover:from-purple-500 hover:to-blue-600 text-white border-0 shadow-lg shadow-purple-500/25',
           className
         )}
+		size="default"
       >
         <SelectValue />
       </SelectTrigger>

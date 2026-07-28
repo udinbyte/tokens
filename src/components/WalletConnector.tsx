@@ -46,14 +46,10 @@ export default function WalletConnector({ className }: { className?: string }) {
   // SUDAH CONNECT
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger >
+      <DropdownMenuTrigger>
         <Button
           variant="purple"
-          className={cn(
-            'h-10 rounded-lg gap-2 text-white',
-            'md:w-auto w-full',
-            className
-          )}
+          className='rounded-lg gap-2 text-white'
         >
           <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
           <span className="font-mono text-sm">

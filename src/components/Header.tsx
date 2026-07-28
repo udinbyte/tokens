@@ -44,7 +44,7 @@ export default function Header() {
               alt="SolanaCreator" 
               className="h-14 w-auto" 
             />
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent hidden sm:inline">
+            <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
               SolanaCreator
             </span>
           </Link>
@@ -91,7 +91,7 @@ export default function Header() {
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger >
                 <Button variant="ghost" size="icon" className="hover:bg-purple-500/10">
-                  <Menu className="h-12 w-2" />
+                  <Menu className="h-10 w-10" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[280px] p-0">
@@ -100,7 +100,7 @@ export default function Header() {
                     <Image 
                       src="/logo.png" 
                       alt="SolanaCreator" 
-                      className="h-12 w-auto" 
+                      className="h-10 w-auto" 
                     />
                     <span className="text-lg font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                       SolanaCreator
@@ -145,10 +145,8 @@ export default function Header() {
                   <div className="border-t my-3" />
                   
                   <div className="space-y-3">
-                    <div className="flex fle-col items-center">
 					  <NetworkSwitcher />
 					  <WalletConnector />
-                    </div>
                   </div>
                 </div>
               </SheetContent>

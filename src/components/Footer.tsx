@@ -8,10 +8,10 @@ import {
   Send, 
   CheckCircle, 
   XCircle,
-  Video,         // Pengganti YouTube di Lucide
-  MessageSquare, // Pengganti Discord di Lucide
-  Code,          // Pengganti GitHub di Lucide
-  Globe          // Pengganti Twitter/X di Lucide
+  Video,
+  MessageSquare,
+  Code,
+  Globe
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,21 +21,20 @@ export default function Footer() {
   const [email, setEmail] = useState('');
 
   const menuOne = [
-    { label: 'Pusat Bantuan', href: '/support' },
-    { label: 'Dukungan Pelanggan', href: '/support' },
-    { label: 'Tentang Kami', href: '/about' },
-    { label: 'Proyek', href: '/project' },
+    { label: 'Pusat Bantuan', href: '#support' },
+    { label: 'Dukungan Pelanggan', href: '#support' },
+    { label: 'Tentang Kami', href: '#about' },
+    { label: 'Proyek', href: '#project' },
     { label: 'Kebijakan Pengembalian', href: '/return-policy' },
   ];
 
   const menuTwo = [
-    { label: 'Pertanyaan Pers', href: '/press' },
-    { label: 'Dukungan Media Sosial', href: '/social' },
-    { label: 'Gambar & B-Roll', href: '/media' },
-    { label: 'Peta Situs', href: '/sitemap' },
+    { label: 'Pertanyaan Pers', href: '#press' },
+    { label: 'Dukungan Media Sosial', href: '#social' },
+    { label: 'Gambar & B-Roll', href: '#media' },
+    { label: 'Peta Situs', href: '#sitemap' },
   ];
 
-  // Menggunakan ikon generik dari Lucide yang tersedia
   const socials = [
     { icon: Globe, href: 'https://twitter.com', label: 'Twitter' },
     { icon: Code, href: 'https://github.com', label: 'GitHub' },
@@ -45,7 +44,7 @@ export default function Footer() {
 
   if (state.succeeded) {
     return (
-      <footer className="bg-background/40 backdrop-blur-3xl border-t border-white/5">
+      <footer className="bg-gradient-to-b from-background to-muted/50 border-t border-white/5">
         <div className="container mx-auto px-4 py-16">
           <div className="flex flex-col items-center justify-center text-center">
             <div className="p-4 rounded-2xl bg-green-500/10 border border-green-500/20">
@@ -64,7 +63,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-background/40 backdrop-blur-3xl border-t border-white/5">
+    <footer className="bg-gradient-to-b from-background to-muted/30 border-t border-white/5">
       <div className="container mx-auto px-4">
         {/* Main Footer */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 py-12">
@@ -87,7 +86,7 @@ export default function Footer() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                  className="p-2 rounded-lg bg-muted/30 hover:bg-muted/60 transition-colors border border-white/5"
                   aria-label={social.label}
                 >
                   <social.icon className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
@@ -98,7 +97,7 @@ export default function Footer() {
 
           {/* Menu 1 */}
           <div>
-            <h3 className="font-semibold mb-4">Dukungan</h3>
+            <h3 className="font-semibold mb-4 text-foreground">Dukungan</h3>
             <ul className="space-y-2">
               {menuOne.map((item) => (
                 <li key={item.label}>
@@ -115,7 +114,7 @@ export default function Footer() {
 
           {/* Menu 2 */}
           <div>
-            <h3 className="font-semibold mb-4">Sumber Daya</h3>
+            <h3 className="font-semibold mb-4 text-foreground">Sumber Daya</h3>
             <ul className="space-y-2">
               {menuTwo.map((item) => (
                 <li key={item.label}>
@@ -132,7 +131,7 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h3 className="font-semibold mb-4">Tetap Terupdate</h3>
+            <h3 className="font-semibold mb-4 text-foreground">Tetap Terupdate</h3>
             <p className="text-sm text-muted-foreground mb-4">
               Berlangganan untuk mendapatkan pembaruan dan berita terbaru
             </p>
@@ -144,7 +143,7 @@ export default function Footer() {
                   placeholder="Masukkan email Anda"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 h-10 rounded-lg bg-muted/50 border-white/10"
+                  className="flex-1 h-10 rounded-lg bg-muted/30 border-white/10 focus:border-purple-500/50"
                   required
                 />
                 <Button
