@@ -7,21 +7,24 @@ import WalletConnector from "@/components/WalletConnector";
 
 export default function HomeView() {
 	
-	const imageOne = [
-		"/images/ai/ai1.png",
-		"/images/ai/ai2.png",
-		"/images/ai/ai3.png",
-		"/images/ai/ai4.png",
-		"/images/ai/ai5.png",
+	const imageFiles = [
+		"ai1.png",
+		"ai2.png",
+		"ai3.png",
+		"ai4.png",
+		"ai5.png",
+		"ai6.png",
+		"ai7.png",
+		"ai8.png",
+		"ai9.png",
+		"ai10.png",
+		"ai11.png",
+		"ai12.png",
 	];
 	
-	const imageTwo = [
-		"/images/ai/ai7.png",
-		"/images/ai/ai8.png",
-		"/images/ai/ai9.png",
-		"/images/ai/ai10.png",
-		"/images/ai/ai11.png",
-	]
+	const midPoint = Math.ceil(imageFiles.length / 2);
+	const imageOne = imageFiles.slice(0, midPoint);
+	const imageTwo = imageFiles.slice(midPoint);
 	
 	return (
 		<section className="relative overflow-hidden pb-20 pt-[72px] min-h-screen">
@@ -52,7 +55,7 @@ export default function HomeView() {
 								        <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
 								            Token Solana
 								        </span> <br />
-								        Tanpa Sekadar Kode
+								        Tanpa Perlu Coding
 								    </h1>
 								    
 								    <p className="md:text-lg text-muted-foreground max-w-md leading-relaxed">
@@ -119,63 +122,42 @@ export default function HomeView() {
 								</div>
 								
 								{/* Right Content - Image Marquee */}
-								<div className="mx-auto h-[595px] overflow-hidden">
-								    <div className="marquee grid grid-cols-2 gap-6">
-									    <div className="relative m-auto flex flex-col gap-6 overflow-hidden">
-										    <div className="marquee-hero flex flex-shrink-0 flex-col min-h-full items-center justify-around gap-6">
-											    {imageOne.map((img, index) => (
-													<Image 
-													    src={img} 
-													    alt={`Token preview ${index + 1}`} 
-													    key={index} 
-													    className="aspect-1 rounded-xl h-full w-60 object-cover border border-white/5 hover:scale-105 hover:border-purple-500/30 transition-all duration-500"
-													    width={240} 
-													    height={240}
-													/>
-												))}
-											</div>
-											
-											<div aria-hidden="true" className="marquee-hero flex flex-shrink-0 flex-col min-h-full items-center justify-around gap-6">
-											    {imageTwo.map((img, index) => (
-													<Image 
-													    src={img} 
-													    alt={`Token preview ${index + 1}`} 
-													    key={index} 
-													    className="aspect-1 rounded-xl h-full w-60 object-cover border border-white/5 hover:scale-105 hover:border-purple-500/30 transition-all duration-500"
-													    width={240} 
-													    height={240}
-													/>
-												))}
-											</div>
-										</div>
-										
-										<div className="marquee-reverse flex flex-col m-auto gap-6 overflow-hidden">
-										    <div className="marquee-hero flex flex-shrink-0 flex-col min-h-full items-center justify-around gap-6">
-											    {imageTwo.map((img, index) => (
-													<Image 
-													    src={img} 
-													    alt={`Token preview ${index + 1}`} 
-													    key={index} 
-													    className="aspect-1 rounded-xl h-full w-60 object-cover border border-white/5 hover:scale-105 hover:border-purple-500/30 transition-all duration-500"
-													    width={240} 
-													    height={240}
-													/>
-												))}
-											</div>
-										    <div aria-hidden="true" className="marquee-hero flex flex-shrink-0 flex-col min-h-full items-center justify-around gap-6">
-													{imageOne.map((img, index) => (
-													    <Image 
-													        src={img} 
+								<div className="mx-auto h-[595px] overflow-hidden w-full max-w-[500px]">
+								    <div className="grid grid-cols-2 gap-4 h-full">
+									    {/* Column 1 - Bergerak ke Atas */}
+									    <div className="relative flex flex-col gap-4 overflow-hidden">
+									        <div className="flex flex-col gap-4 marquee-up">
+										        {[...imageOne, ...imageOne, ...imageOne].map((filename, index) => (
+											        <div key={`col1-${index}`} className="flex-shrink-0">
+												        <Image 
+													        src={`/images/ai/${filename}`}
 													        alt={`Token preview ${index + 1}`} 
-													        key={index} 
-													        className="aspect-1 rounded-xl h-full w-60 object-cover border border-white/5 hover:scale-105 hover:border-purple-500/30 transition-all duration-500"
-													        width={240} 
-													        height={240}
-													    />
-												    ))}
-										    </div>
-										</div>
-									</div>
+													        className="rounded-xl w-full aspect-square object-cover border border-white/5 hover:scale-105 hover:border-purple-500/30 transition-all duration-500"
+													        width={200} 
+													        height={200}
+												        />
+											        </div>
+										        ))}
+									        </div>
+								        </div>
+								        
+									    {/* Column 2 - Bergerak ke Bawah */}
+									    <div className="relative flex flex-col gap-4 overflow-hidden">
+									        <div className="flex flex-col gap-4 marquee-down">
+										        {[...imageTwo, ...imageTwo, ...imageTwo].map((filename, index) => (
+											        <div key={`col2-${index}`} className="flex-shrink-0">
+												        <Image 
+													        src={`/images/ai/${filename}`}
+													        alt={`Token preview ${index + 1}`} 
+													        className="rounded-xl w-full aspect-square object-cover border border-white/5 hover:scale-105 hover:border-purple-500/30 transition-all duration-500"
+													        width={200} 
+													        height={200}
+												        />
+											        </div>
+										        ))}
+									        </div>
+								        </div>
+								    </div>
 								</div>
 							</div>
 						</div>
