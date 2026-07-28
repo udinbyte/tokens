@@ -22,7 +22,7 @@ export default function HomeView() {
 		"ai9.png",
 		"ai10.png",
 		"ai11.png",
-		//"ai12.png",
+		"ai8.png",
 	];
 	
 	const midPoint = Math.ceil(imageFiles.length / 2);
@@ -113,7 +113,7 @@ export default function HomeView() {
 									    
 									    {/* Action Buttons - Responsive */}
 									    <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-2">
-										    <Button  className="rounded-full px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 h-auto">
+										    <Button className="rounded-full px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 h-auto">
 											    <Link href="/dashboard/create-token" className="flex items-center gap-2">
 											        <Rocket className="h-4 w-4 sm:h-5 sm:w-5" />
 											        Buat Token Sekarang
@@ -124,7 +124,7 @@ export default function HomeView() {
 										
 										{/* Bottom text */}
 										<p className="text-[10px] sm:text-[11px] text-muted-foreground/60 text-center lg:text-left">
-										    Gratis memulai. Tanpa kartu kredit. Kelola sendiri assets Anda.
+										    Gratis memulai. Tanpa kartu kredit. Kelola sendiri aset Anda.
 										</p>
 									</div>
 									
