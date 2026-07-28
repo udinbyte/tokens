@@ -22,7 +22,7 @@ export default function HomeView() {
 		"ai9.png",
 		"ai10.png",
 		"ai11.png",
-		"ai9.png",
+		//"ai12.png",
 	];
 	
 	const midPoint = Math.ceil(imageFiles.length / 2);

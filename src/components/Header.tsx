@@ -98,7 +98,7 @@ export default function Header() {
             </div>
 
             <Sheet open={open} onOpenChange={setOpen}>
-              <SheetTrigger>
+              <SheetTrigger >
                 <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9 hover:bg-purple-500/10">
                   <Menu className="h-5 w-5 sm:h-5 sm:w-5" />
                 </Button>
