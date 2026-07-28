@@ -34,23 +34,26 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-background/80 backdrop-blur-xl">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+      <div className="container mx-auto px-3 sm:px-4">
+        <div className="flex h-14 sm:h-16 items-center justify-between gap-2">
           
           {/* KIRI: Logo */}
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity flex-shrink-0">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity flex-shrink-0">
             <Image 
               src="/logo.png" 
               alt="SolanaCreator" 
-              className="h-14 w-auto" 
+              className="h-8 sm:h-10 md:h-12 w-auto" 
+              width={40}
+              height={40}
+              priority
             />
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            <span className="text-sm sm:text-lg md:text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent truncate max-w-[100px] sm:max-w-[150px] md:max-w-none">
               SolanaCreator
             </span>
           </Link>
 
           {/* TENGAH: Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-1">
             {navItems.map(({ href, label }) => (
               <Link
                 key={href}
@@ -80,29 +83,37 @@ export default function Header() {
             )}
           </div>
 
-          {/* KANAN: Network + Wallet */}
-          <div className="hidden md:flex items-center gap-3 flex-shrink-0">
+          {/* KANAN: Network + Wallet - Desktop */}
+          <div className="hidden lg:flex items-center gap-2 xl:gap-3 flex-shrink-0">
             <NetworkSwitcher />
             <WalletConnector />
           </div>
 
-          {/* MOBILE */}
-          <div className="flex md:hidden items-center gap-2">
+          {/* MOBILE & TABLET */}
+          <div className="flex lg:hidden items-center gap-1 sm:gap-2">
+            {/* Network + Wallet compact untuk tablet - tetap pakai komponen asli */}
+            <div className="hidden sm:flex items-center gap-1">
+              <NetworkSwitcher />
+              <WalletConnector />
+            </div>
+
             <Sheet open={open} onOpenChange={setOpen}>
-              <SheetTrigger >
-                <Button variant="ghost" size="icon" className="hover:bg-purple-500/10">
-                  <Menu className="h-10 w-10" />
+              <SheetTrigger>
+                <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9 hover:bg-purple-500/10">
+                  <Menu className="h-5 w-5 sm:h-5 sm:w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[280px] p-0">
+              <SheetContent side="right" className="w-[280px] sm:w-[320px] p-0">
                 <SheetHeader className="p-4 border-b">
                   <SheetTitle className="text-left flex items-center gap-2">
                     <Image 
                       src="/logo.png" 
                       alt="SolanaCreator" 
-                      className="h-10 w-auto" 
+                      className="h-8 w-auto" 
+                      width={32}
+                      height={32}
                     />
-                    <span className="text-lg font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                    <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                       SolanaCreator
                     </span>
                   </SheetTitle>
@@ -144,9 +155,10 @@ export default function Header() {
 
                   <div className="border-t my-3" />
                   
+                  {/* Network + Wallet di sheet - full width */}
                   <div className="space-y-3">
-					  <NetworkSwitcher />
-					  <WalletConnector />
+                    <NetworkSwitcher />
+                    <WalletConnector />
                   </div>
                 </div>
               </SheetContent>
