@@ -58,6 +58,6 @@ export default function ToolsView() {
 					</Link>
 				</div>
 			</div>
-		</div>
+		</section>
 	);
 };
