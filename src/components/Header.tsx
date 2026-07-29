@@ -63,7 +63,7 @@ export default function Header() {
 
             {/* Hamburger Button */}
             <Sheet open={open} onOpenChange={setOpen}>
-              <SheetTrigger asChild>
+              <SheetTrigger >
                 <Button variant="ghost" size="icon" className="hover:bg-purple-500/10">
                   <Menu className="h-5 w-5" />
                 </Button>
