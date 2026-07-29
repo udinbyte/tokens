@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { getMetadata } from '@metaplex-foundation/mpl-token-metadata';
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata'; // ✅ PAKE Metadata, BUKAN getMetadata
 import { getMint } from '@solana/spl-token';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
@@ -29,16 +29,10 @@ import {
   Pencil,
   Save,
   RefreshCw,
-  Image as ImageIcon,
-  Info,
-  Coins,
-  Hash,
-  Users
 } from 'lucide-react';
 import { useNetwork } from '@/app/providers/NetworkProvider';
 import { getExplorerUrl } from '@/utils/explorer';
 import { notifySuccess, notifyError, notifyWarning } from '@/utils/notifications';
-import Image from 'next/image';
 
 interface TokenMetadata {
   mint: string;
@@ -82,6 +76,9 @@ export default function MetadataPage() {
     image: '',
   });
 
+  // 🔥 METADATA PROGRAM ID
+  const METADATA_PROGRAM_ID = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
+
   // Fetch metadata from URI
   const fetchUriMetadata = async (uri: string) => {
     try {
@@ -89,7 +86,6 @@ export default function MetadataPage() {
       setRawMetadata(response.data);
       setDescription(response.data.description || '');
       
-      // Extract image
       if (response.data.image) {
         setImageUrl(response.data.image);
         setEditData(prev => ({ ...prev, image: response.data.image }));
@@ -102,10 +98,10 @@ export default function MetadataPage() {
     }
   };
 
-  // Fetch metadata
+  // 🔥 FETCH METADATA PAKE METADATA CLASS
   const fetchMetadata = async () => {
     if (!mintAddress) {
-      notifyWarning('Please enter a mint address');
+      notifyWarning('Masukkan alamat mint token');
       return;
     }
 
@@ -119,22 +115,22 @@ export default function MetadataPage() {
     try {
       const mint = new PublicKey(mintAddress);
       
-      // Get metadata
-      const metadataAccount = await getMetadata(mint);
+      // 🔥 PAKE Metadata.fromAccountAddress
+      const metadataPDA = await Metadata.fromAccountAddress(connection, mint);
       
       // Get token supply & decimals
       const mintInfo = await getMint(connection, mint);
       
       const metadataData: TokenMetadata = {
         mint: mintAddress,
-        name: metadataAccount.data.name || 'N/A',
-        symbol: metadataAccount.data.symbol || 'N/A',
-        uri: metadataAccount.data.uri || 'N/A',
-        sellerFeeBasisPoints: metadataAccount.data.sellerFeeBasisPoints || 0,
-        creators: metadataAccount.data.creators || [],
-        isMutable: metadataAccount.isMutable,
-        primarySaleHappened: metadataAccount.data.primarySaleHappened,
-        updateAuthority: metadataAccount.updateAuthority?.toString(),
+        name: metadataPDA.data.name || 'N/A',
+        symbol: metadataPDA.data.symbol || 'N/A',
+        uri: metadataPDA.data.uri || 'N/A',
+        sellerFeeBasisPoints: metadataPDA.data.sellerFeeBasisPoints || 0,
+        creators: metadataPDA.data.creators || [],
+        isMutable: metadataPDA.isMutable,
+        primarySaleHappened: metadataPDA.data.primarySaleHappened,
+        updateAuthority: metadataPDA.updateAuthority?.toString(),
       };
       
       setMetadata(metadataData);
@@ -157,10 +153,10 @@ export default function MetadataPage() {
         image: imageUrl || '',
       });
       
-      notifySuccess('Metadata fetched successfully!');
+      notifySuccess('Metadata berhasil diambil!');
     } catch (error: any) {
       console.error('Error fetching metadata:', error);
-      notifyError('Failed to fetch metadata', error.message || 'Invalid mint address');
+      notifyError('Gagal mengambil metadata', error.message || 'Alamat mint tidak valid');
       setMetadata(null);
     } finally {
       setFetching(false);
@@ -177,16 +173,14 @@ export default function MetadataPage() {
   // Update metadata (simulasi)
   const updateMetadata = async () => {
     if (!metadata?.isMutable) {
-      notifyError('Cannot update', 'This token is not mutable');
+      notifyError('Tidak dapat diupdate', 'Token ini tidak mutable');
       return;
     }
 
     setLoading(true);
     try {
-      // TODO: Implement actual metadata update on-chain
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Update local state
       setMetadata(prev => prev ? {
         ...prev,
         name: editData.name,
@@ -196,10 +190,10 @@ export default function MetadataPage() {
       setDescription(editData.description);
       setImageUrl(editData.image);
       
-      notifySuccess('Metadata updated successfully! 🎉');
+      notifySuccess('Metadata berhasil diupdate! 🎉');
       setIsEditing(false);
     } catch (error: any) {
-      notifyError('Failed to update metadata', error.message);
+      notifyError('Gagal update metadata', error.message);
     } finally {
       setLoading(false);
     }
@@ -225,25 +219,25 @@ export default function MetadataPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-              Token Metadata
+              Metadata Token
             </h1>
             <p className="text-sm text-muted-foreground">
-              View and manage your token metadata
+              Lihat dan kelola metadata token Anda
             </p>
           </div>
         </div>
 
         <FieldGroup>
           <FieldSet className="border border-white/5 rounded-xl bg-card p-6">
-            <FieldLegend>View Metadata</FieldLegend>
+            <FieldLegend>Lihat Metadata</FieldLegend>
             <FieldDescription>
-              Enter your token mint address to view metadata
+              Masukkan alamat mint token untuk melihat metadata
             </FieldDescription>
 
             {/* Input Mint Address */}
             <div className="flex gap-2 mt-4">
               <Input
-                placeholder="Enter mint address..."
+                placeholder="Masukkan alamat mint..."
                 value={mintAddress}
                 onChange={(e) => setMintAddress(e.target.value)}
                 className="flex-1 h-11 bg-muted/50 border-white/10 focus:border-purple-500/50"
@@ -257,7 +251,7 @@ export default function MetadataPage() {
                 {fetching ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  'Fetch'
+                  'Ambil'
                 )}
               </Button>
             </div>
@@ -268,7 +262,7 @@ export default function MetadataPage() {
             {fetching && (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
-                <span className="ml-3 text-muted-foreground">Fetching metadata...</span>
+                <span className="ml-3 text-muted-foreground">Mengambil metadata...</span>
               </div>
             )}
 
@@ -337,7 +331,7 @@ export default function MetadataPage() {
                       {isEditing ? (
                         <>
                           <FileText className="h-3.5 w-3.5" />
-                          Cancel
+                          Batal
                         </>
                       ) : (
                         <>
@@ -352,11 +346,11 @@ export default function MetadataPage() {
                 {/* Token Info Summary */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div className="bg-muted/30 rounded-lg p-3 text-center">
-                    <p className="text-xs text-muted-foreground">Name</p>
+                    <p className="text-xs text-muted-foreground">Nama</p>
                     <p className="font-semibold text-sm truncate">{metadata.name}</p>
                   </div>
                   <div className="bg-muted/30 rounded-lg p-3 text-center">
-                    <p className="text-xs text-muted-foreground">Symbol</p>
+                    <p className="text-xs text-muted-foreground">Simbol</p>
                     <p className="font-semibold text-sm">{metadata.symbol}</p>
                   </div>
                   <div className="bg-muted/30 rounded-lg p-3 text-center">
@@ -366,7 +360,7 @@ export default function MetadataPage() {
                     </p>
                   </div>
                   <div className="bg-muted/30 rounded-lg p-3 text-center">
-                    <p className="text-xs text-muted-foreground">Decimals</p>
+                    <p className="text-xs text-muted-foreground">Desimal</p>
                     <p className="font-semibold text-sm">{tokenSupply?.decimals || 'N/A'}</p>
                   </div>
                 </div>
@@ -376,15 +370,13 @@ export default function MetadataPage() {
                 {/* Display Mode */}
                 {!isEditing ? (
                   <div className="space-y-3">
-                    {/* Description */}
                     {description && (
                       <div>
-                        <p className="text-xs text-muted-foreground">Description</p>
+                        <p className="text-xs text-muted-foreground">Deskripsi</p>
                         <p className="text-sm mt-1">{description}</p>
                       </div>
                     )}
 
-                    {/* URI */}
                     <div>
                       <p className="text-xs text-muted-foreground">URI</p>
                       <p className="text-sm font-mono break-all">{metadata.uri}</p>
@@ -392,25 +384,24 @@ export default function MetadataPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-xs text-muted-foreground">Seller Fee</p>
+                        <p className="text-xs text-muted-foreground">Biaya Penjual</p>
                         <p className="font-medium">{metadata.sellerFeeBasisPoints / 100}%</p>
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">Mutable</p>
                         <p className="font-medium">
                           {metadata.isMutable ? (
-                            <span className="text-yellow-500">Yes</span>
+                            <span className="text-yellow-500">Ya</span>
                           ) : (
-                            <span className="text-green-500">No</span>
+                            <span className="text-green-500">Tidak</span>
                           )}
                         </p>
                       </div>
                     </div>
 
-                    {/* Creators */}
                     {metadata.creators && metadata.creators.length > 0 && (
                       <div>
-                        <p className="text-xs text-muted-foreground">Creators</p>
+                        <p className="text-xs text-muted-foreground">Kreator</p>
                         <div className="space-y-1 mt-1">
                           {metadata.creators.map((creator, idx) => (
                             <div key={idx} className="flex items-center gap-2 text-sm">
@@ -429,7 +420,6 @@ export default function MetadataPage() {
                       </div>
                     )}
 
-                    {/* Update Authority */}
                     {metadata.updateAuthority && (
                       <div>
                         <p className="text-xs text-muted-foreground">Update Authority</p>
@@ -437,14 +427,13 @@ export default function MetadataPage() {
                       </div>
                     )}
 
-                    {/* Raw JSON Toggle */}
                     {rawMetadata && (
                       <div>
                         <button
                           onClick={() => setShowRaw(!showRaw)}
                           className="text-xs text-purple-400 hover:underline"
                         >
-                          {showRaw ? 'Hide Raw JSON' : 'View Raw JSON'}
+                          {showRaw ? 'Sembunyikan Raw JSON' : 'Lihat Raw JSON'}
                         </button>
                         {showRaw && (
                           <pre className="mt-2 p-3 rounded-lg bg-muted/50 text-xs overflow-auto max-h-60">
@@ -455,19 +444,18 @@ export default function MetadataPage() {
                     )}
                   </div>
                 ) : (
-                  // Edit Mode
                   <div className="space-y-4">
                     {!metadata.isMutable && (
                       <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 flex gap-2">
                         <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
                         <p className="text-xs text-red-500">
-                          This token is NOT mutable. Changes cannot be saved on-chain.
+                          Token ini TIDAK mutable. Perubahan tidak dapat disimpan di on-chain.
                         </p>
                       </div>
                     )}
 
                     <div>
-                      <Label htmlFor="edit-name">Name</Label>
+                      <Label htmlFor="edit-name">Nama</Label>
                       <Input
                         id="edit-name"
                         value={editData.name}
@@ -477,7 +465,7 @@ export default function MetadataPage() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="edit-symbol">Symbol</Label>
+                      <Label htmlFor="edit-symbol">Simbol</Label>
                       <Input
                         id="edit-symbol"
                         value={editData.symbol}
@@ -487,7 +475,7 @@ export default function MetadataPage() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="edit-description">Description</Label>
+                      <Label htmlFor="edit-description">Deskripsi</Label>
                       <Textarea
                         id="edit-description"
                         value={editData.description}
@@ -498,7 +486,7 @@ export default function MetadataPage() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="edit-image">Image URL</Label>
+                      <Label htmlFor="edit-image">URL Gambar</Label>
                       <Input
                         id="edit-image"
                         placeholder="https://..."
@@ -519,7 +507,7 @@ export default function MetadataPage() {
                         ) : (
                           <>
                             <Save className="h-4 w-4 mr-2" />
-                            Save Changes
+                            Simpan Perubahan
                           </>
                         )}
                       </Button>
@@ -534,7 +522,7 @@ export default function MetadataPage() {
               <div className="text-center py-8">
                 <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                 <p className="text-muted-foreground">
-                  Enter a mint address to view metadata
+                  Masukkan alamat mint untuk melihat metadata
                 </p>
               </div>
             )}
@@ -542,7 +530,7 @@ export default function MetadataPage() {
         </FieldGroup>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          Built with ❤️ on Solana {network}
+          Dibuat dengan ❤️ di Solana {network}
         </p>
       </div>
     </div>
