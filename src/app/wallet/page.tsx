@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { useNetwork } from '@/app/providers/NetworkProvider';
-import { useBalanceStore } from '@/stores/balanceStore';
+import useBalanceStore from '@/stores/balanceStore';
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount } from '@solana/spl-token';
 import { 
