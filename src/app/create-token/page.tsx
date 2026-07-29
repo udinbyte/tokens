@@ -18,7 +18,7 @@ import {
   createAssociatedTokenAccountInstruction
 } from '@solana/spl-token';
 import {
-  PROGRAM_ID,
+  programId as PROGRAM_ID,
   createCreateMetadataAccountV3Instruction,
 } from '@metaplex-foundation/mpl-token-metadata';
 import axios from 'axios';
