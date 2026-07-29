@@ -31,7 +31,7 @@ export default function Header() {
     { href: '/', label: 'Home', icon: Home },
     { href: '/create-token', label: 'Create Token', icon: Coins },
     { href: '/metadata', label: 'Metadata', icon: FileText },
-    { href: '/transfer', label: 'Transfer', icon: Send },
+    { href: '/wallet', label: 'Wallet my', icon: Send },
   ];
 
   const isActive = (href: string) => pathname === href;
