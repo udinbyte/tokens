@@ -15,8 +15,6 @@ import {
   ArrowDownRight,
   Coins,
   History,
-  Settings,
-  QrCode,
   ArrowDown,
   ArrowUp,
   Clock,
@@ -50,7 +48,7 @@ export default function WalletPage() {
   const { publicKey, connected, disconnect } = useWallet();
   const { connection } = useConnection();
   const { network } = useNetwork();
-  const { balance, loading, fetchBalance } = useBalanceStore();
+  const { balance, loading, getUserSOLBalance } = useBalanceStore();
   
   const [copied, setCopied] = useState(false);
   const [tokenAccounts, setTokenAccounts] = useState<TokenAccount[]>([]);
@@ -136,7 +134,7 @@ export default function WalletPage() {
 
   useEffect(() => {
     if (connected && publicKey) {
-      fetchBalance(publicKey, connection.rpcEndpoint);
+      getUserSOLBalance(publicKey, connection);
       fetchTokenAccounts();
       fetchTransactions();
     }
