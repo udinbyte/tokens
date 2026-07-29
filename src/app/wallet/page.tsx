@@ -5,9 +5,9 @@ import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { useNetwork } from '@/app/providers/NetworkProvider';
 import useBalanceStore from '@/stores/balanceStore';
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
-import { getAssociatedTokenAddress, getAccount } from '@solana/spl-token';
+import { getAccount } from '@solana/spl-token';
 import { 
-  Wallet, 
+  Wallet as WalletIcon, 
   Copy, 
   Check, 
   ExternalLink, 
@@ -17,8 +17,8 @@ import {
   History,
   Settings,
   QrCode,
-  Send,
-  Receive,
+  ArrowDown,
+  ArrowUp,
   Clock,
   Loader2
 } from 'lucide-react';
@@ -57,7 +57,6 @@ export default function WalletPage() {
   const [tokensLoading, setTokensLoading] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activeTab, setActiveTab] = useState<'assets' | 'history'>('assets');
-  const [showPrivateKey, setShowPrivateKey] = useState(false);
 
   // Fetch token accounts
   const fetchTokenAccounts = async () => {
@@ -95,12 +94,11 @@ export default function WalletPage() {
     }
   };
 
-  // Fetch transactions (mock - real implementation would use getSignaturesForAddress)
+  // Fetch transactions (mock)
   const fetchTransactions = async () => {
     if (!publicKey) return;
     
     try {
-      // Mock data - replace with actual RPC call
       const mockTransactions: Transaction[] = [
         {
           signature: '5x3...',
@@ -183,7 +181,7 @@ export default function WalletPage() {
       case 'create':
         return <Coins className="h-4 w-4 text-purple-500" />;
       case 'airdrop':
-        return <Receive className="h-4 w-4 text-blue-500" />;
+        return <ArrowDown className="h-4 w-4 text-blue-500" />;
       default:
         return <Clock className="h-4 w-4 text-gray-500" />;
     }
@@ -207,7 +205,7 @@ export default function WalletPage() {
       <div className="flex items-center justify-center min-h-screen p-4 bg-background">
         <div className="text-center">
           <div className="mx-auto mb-4 rounded-full bg-purple-500/10 p-4 w-16 h-16 flex items-center justify-center">
-            <Wallet className="h-8 w-8 text-purple-400" />
+            <WalletIcon className="h-8 w-8 text-purple-400" />
           </div>
           <h2 className="text-2xl font-semibold">Wallet Not Connected</h2>
           <p className="text-muted-foreground mt-2">
@@ -224,7 +222,7 @@ export default function WalletPage() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="rounded-lg bg-gradient-to-r from-purple-500/20 to-blue-500/20 p-3">
-            <Wallet className="h-6 w-6 text-purple-400" />
+            <WalletIcon className="h-6 w-6 text-purple-400" />
           </div>
           <div>
             <h1 className="text-2xl font-bold">Wallet</h1>
@@ -265,13 +263,13 @@ export default function WalletPage() {
           <div className="flex items-center gap-2">
             <Link href="/wallet/send">
               <Button className="gap-2 bg-gradient-to-r from-purple-400 to-blue-500">
-                <Send className="h-4 w-4" />
+                <ArrowUp className="h-4 w-4" />
                 Send
               </Button>
             </Link>
             <Link href="/wallet/receive">
               <Button variant="outline" className="gap-2">
-                <Receive className="h-4 w-4" />
+                <ArrowDown className="h-4 w-4" />
                 Receive
               </Button>
             </Link>
