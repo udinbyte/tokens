@@ -5,7 +5,7 @@ import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { useNetwork } from '@/app/providers/NetworkProvider';
 import useBalanceStore from '@/stores/balanceStore';
 import { PublicKey } from '@solana/web3.js';
-import { getAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { 
   Wallet as WalletIcon, 
   Copy, 
@@ -55,7 +55,7 @@ export default function WalletPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activeTab, setActiveTab] = useState<'assets' | 'history'>('assets');
 
-  // ✅ Fetch token accounts - PAKE TOKEN_PROGRAM_ID
+  // 🔥 FETCH TOKEN ACCOUNTS - PAKE PARSING MANUAL
   const fetchTokenAccounts = async () => {
     if (!publicKey) return;
     
@@ -69,16 +69,20 @@ export default function WalletPage() {
       
       for (const accountInfo of tokenAccounts.value) {
         try {
-          const accountData = await getAccount(connection, accountInfo.pubkey);
-          const mint = accountData.mint.toString();
-          const amount = Number(accountData.amount);
-          const decimals = accountData.decimals;
+          const data = accountInfo.account.data;
           
-          accounts.push({
-            mint,
-            balance: amount / Math.pow(10, decimals),
-            decimals: decimals,
-          });
+          // 🔥 PARSE MANUAL
+          const mint = new PublicKey(data.slice(0, 32)).toString();
+          const amount = Number(data.readBigUInt64LE(64));
+          const decimals = data[44]; // byte ke-44 adalah decimals
+          
+          if (amount > 0) {
+            accounts.push({
+              mint,
+              balance: amount / Math.pow(10, decimals),
+              decimals: decimals,
+            });
+          }
         } catch (error) {
           console.error('Error parsing token account:', error);
         }
