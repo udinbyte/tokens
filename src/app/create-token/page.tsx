@@ -80,7 +80,7 @@ export default function CreateToken() {
     description: ''
   });
   
-  // Handle form change dengan null safety
+  // Handle form change - sudah fix untuk menerima string | null
   const handleFormChange = (fieldName: string, value: string | null) => {
     setToken({ ...token, [fieldName]: value || '' });
   };
@@ -356,7 +356,7 @@ export default function CreateToken() {
                   <p className="text-xs text-muted-foreground mt-1">Maksimal 10 karakter</p>
                 </Field>
 
-                {/* Decimals */}
+                {/* Decimals - FIXED ✅ */}
                 <Field>
                   <div className="flex items-center gap-2">
                     <FieldLabel>Desimal Token *</FieldLabel>
@@ -547,7 +547,7 @@ export default function CreateToken() {
                       Membuat Token...
                     </>
                   ) : (
-                    'Buat Token'
+                    '🚀 Buat Token'
                   )}
                 </Button>
 
@@ -556,7 +556,7 @@ export default function CreateToken() {
                   <div className="rounded-lg border border-green-500/20 bg-green-500/10 p-4 space-y-3 animate-in fade-in slide-in-from-bottom-2">
                     <p className="text-sm text-green-500 font-medium flex items-center gap-2">
                       <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                       Token berhasil dibuat!
+                      ✅ Token berhasil dibuat!
                     </p>
                     
                     <div className="space-y-1">
