@@ -45,7 +45,6 @@ interface TokenMetadata {
   sellerFeeBasisPoints: number;
   creators: Array<{ address: string; verified: boolean; share: number }>;
   isMutable: boolean;
-  primarySaleHappened?: boolean;
   updateAuthority?: string;
 }
 
@@ -131,7 +130,6 @@ export default function MetadataPage() {
         sellerFeeBasisPoints: metadataPDA.data.sellerFeeBasisPoints || 0,
         creators: creators,
         isMutable: metadataPDA.isMutable,
-        primarySaleHappened: metadataPDA.data.primarySaleHappened,
         updateAuthority: metadataPDA.updateAuthority?.toString(),
       };
       
@@ -232,7 +230,6 @@ export default function MetadataPage() {
               Masukkan alamat mint token untuk melihat metadata
             </FieldDescription>
 
-            {/* Input Mint Address */}
             <div className="flex gap-2 mt-4">
               <Input
                 placeholder="Masukkan alamat mint..."
@@ -256,7 +253,6 @@ export default function MetadataPage() {
 
             <FieldSeparator className="my-4" />
 
-            {/* Loading State */}
             {fetching && (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
@@ -264,10 +260,8 @@ export default function MetadataPage() {
               </div>
             )}
 
-            {/* Metadata Display */}
             {metadata && !fetching && (
               <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
-                {/* Token Image */}
                 {imageUrl && (
                   <div className="flex justify-center">
                     <div className="relative h-32 w-32 rounded-lg overflow-hidden border border-white/10">
@@ -283,7 +277,6 @@ export default function MetadataPage() {
                   </div>
                 )}
 
-                {/* Header Actions */}
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">Mint:</span>
@@ -341,7 +334,6 @@ export default function MetadataPage() {
                   </div>
                 </div>
 
-                {/* Token Info Summary */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div className="bg-muted/30 rounded-lg p-3 text-center">
                     <p className="text-xs text-muted-foreground">Nama</p>
@@ -365,7 +357,6 @@ export default function MetadataPage() {
 
                 <FieldSeparator />
 
-                {/* Display Mode */}
                 {!isEditing ? (
                   <div className="space-y-3">
                     {description && (
@@ -442,7 +433,6 @@ export default function MetadataPage() {
                     )}
                   </div>
                 ) : (
-                  // Edit Mode
                   <div className="space-y-4">
                     {!metadata.isMutable && (
                       <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 flex gap-2">
@@ -516,7 +506,6 @@ export default function MetadataPage() {
               </div>
             )}
 
-            {/* Empty State */}
             {!metadata && !fetching && (
               <div className="text-center py-8">
                 <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
