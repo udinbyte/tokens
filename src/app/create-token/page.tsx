@@ -18,12 +18,13 @@ import {
   createAssociatedTokenAccountInstruction
 } from '@solana/spl-token';
 import {
+  PROGRAM_ID,
   createCreateMetadataAccountV3Instruction,
 } from '@metaplex-foundation/mpl-token-metadata';
 import axios from 'axios';
 import { notifySuccess, notifyError, notifyWarning } from '@/utils/notifications';
 import { useNetwork } from '@/app/providers/NetworkProvider';
-import { getExplorerUrl } from '@/utils/explorer';
+import { getExplorerUrl } from '@/utils/explorer'; // ✅ IMPORT!
 
 // shadcn components
 import { Button } from '@/components/ui/button';
@@ -50,9 +51,6 @@ import { Loader2, Upload, AlertCircle, Coins, Copy, ExternalLink, Check } from '
 import Link from 'next/link';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 
-// 🔥 METADATA PROGRAM ID
-const METADATA_PROGRAM_ID = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
-
 const items = [
   { label: '0 - Non-fractional (NFT / Soulbound)', value: 0 },
   { label: '2 - Basic (Cents-style)', value: 2 },
@@ -60,9 +58,6 @@ const items = [
   { label: '9 - Standard (SOL style) Recommended', value: 9 },
   { label: '12 - High precision (DeFi tokens)', value: 12 },
 ];
-
-const pinataApiKey = "e736843165cc7bde50ef";
-const pinataSecretApiKey = "34776c6523d2b7c6cabe3659afed87b0072a075759df9b0af7553a4b4da93ca8";
 
 export default function CreateToken() {
   const { network } = useNetwork();
@@ -100,8 +95,8 @@ export default function CreateToken() {
         url: 'https://api.pinata.cloud/pinning/pinFileToIPFS',
         data: formData,
         headers: {
-          pinata_api_key: pinataApiKey,
-          pinata_secret_api_key: pinataSecretApiKey,
+          pinata_api_key: process.env.NEXT_PUBLIC_PINATA_API_KEY || '',
+          pinata_secret_api_key: process.env.NEXT_PUBLIC_PINATA_SECRET_KEY || '',
           'Content-Type': 'multipart/form-data'
         }
       });
@@ -109,7 +104,7 @@ export default function CreateToken() {
       return `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
     } catch (error) {
       console.error('Error uploading image:', error);
-      notifyError('Gagal upload gambar', 'Silakan coba lagi');
+      notifyError('Failed to upload image', 'Please try again');
       return null;
     }
   };
@@ -119,7 +114,7 @@ export default function CreateToken() {
     const { name, symbol, image, description } = tokenData;
     
     if (!name || !symbol || !image || !description) {
-      notifyWarning('Harap isi semua data token!');
+      notifyWarning('Please fill in all token data!');
       return null;
     }
     
@@ -131,8 +126,8 @@ export default function CreateToken() {
         url: 'https://api.pinata.cloud/pinning/pinJSONToIPFS',
         data: JSON.stringify({ name, symbol, image, description }),
         headers: {
-          pinata_api_key: pinataApiKey,
-          pinata_secret_api_key: pinataSecretApiKey,
+          pinata_api_key: process.env.NEXT_PUBLIC_PINATA_API_KEY || '',
+          pinata_secret_api_key: process.env.NEXT_PUBLIC_PINATA_SECRET_KEY || '',
           'Content-Type': 'application/json'
         }
       });
@@ -140,13 +135,14 @@ export default function CreateToken() {
       return `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
     } catch (error) {
       console.error('Error uploading metadata:', error);
-      notifyError('Gagal upload metadata ke Pinata');
+      notifyError('Failed to upload metadata to Pinata');
       return null;
     } finally {
       setIsLoading(false);
     }
   };
   
+  // ✅ PAKE getExplorerUrl DARI UTILS
   const getExplorerLink = (address: string) => {
     return getExplorerUrl(network, address, 'address');
   };
@@ -161,14 +157,14 @@ export default function CreateToken() {
   // Create token
   const createToken = useCallback(async () => {
     if (!publicKey) {
-      notifyError('Wallet tidak terhubung', 'Silakan hubungkan wallet Anda terlebih dahulu');
+      notifyError('Wallet not connected', 'Please connect your wallet first');
       return;
     }
 
     const { name, symbol, decimals, amount, image, description } = token;
     
     if (!name || !symbol || !decimals || !amount || !image || !description) {
-      notifyWarning('Harap isi semua data token!');
+      notifyWarning('Please fill in all token data!');
       return;
     }
 
@@ -188,9 +184,9 @@ export default function CreateToken() {
       const createMetadataInstruction = createCreateMetadataAccountV3Instruction({
         metadata: PublicKey.findProgramAddressSync([
           Buffer.from('metadata'),
-          METADATA_PROGRAM_ID.toBuffer(),
+          PROGRAM_ID.toBuffer(),
           mintKeypair.publicKey.toBuffer()
-        ], METADATA_PROGRAM_ID)[0],
+        ], PROGRAM_ID)[0],
         mint: mintKeypair.publicKey,
         mintAuthority: publicKey,
         payer: publicKey,
@@ -247,8 +243,8 @@ export default function CreateToken() {
       
       setTokenMintAddress(mintKeypair.publicKey.toString());
       notifySuccess(
-        'Token berhasil dibuat! 🎉',
-        `${name} (${symbol}) telah deployed di ${network}`,
+        'Token created successfully! 🎉',
+        `${name} (${symbol}) has been deployed on ${network}`,
         signature,
         network
       );
@@ -266,7 +262,7 @@ export default function CreateToken() {
       
     } catch (error: any) {
       console.error('Error creating token:', error);
-      notifyError('Gagal membuat token', error.message || 'Terjadi kesalahan yang tidak diketahui');
+      notifyError('Failed to create token', error.message || 'Unknown error');
     } finally {
       setIsLoading(false);
     }
@@ -300,10 +296,10 @@ export default function CreateToken() {
           </div>
           <div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-              Buat Token
+              Create Token
             </h1>
             <p className="text-sm text-muted-foreground">
-              Luncurkan token SPL Anda sendiri di Solana
+              Launch your own SPL token on Solana
             </p>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs text-muted-foreground">Network:</span>
@@ -317,18 +313,18 @@ export default function CreateToken() {
         <form onSubmit={(e) => { e.preventDefault(); createToken(); }}>
           <FieldGroup>
             <FieldSet className="border border-white/5 rounded-xl bg-card p-6">
-              <FieldLegend className="text-lg font-semibold">Buat Token Solana</FieldLegend>
+              <FieldLegend className="text-lg font-semibold">Create Token Solana</FieldLegend>
               <FieldDescription className="text-muted-foreground">
-                Semua transaksi aman dan terenkripsi
+                All transactions are secure and encrypted
               </FieldDescription>
 
               <FieldGroup className="space-y-4 mt-4">
                 {/* Token Name */}
                 <Field>
-                  <FieldLabel htmlFor="name-token">Nama Token</FieldLabel>
+                  <FieldLabel htmlFor="name-token">Token Name</FieldLabel>
                   <Input
                     id="name-token"
-                    placeholder="Misal: Token Keren Saya"
+                    placeholder="My Awesome Token"
                     value={token.name}
                     onChange={(e) => handleFormChange('name', e.target.value)}
                     required
@@ -338,10 +334,10 @@ export default function CreateToken() {
 
                 {/* Token Symbol */}
                 <Field>
-                  <FieldLabel htmlFor="symbol-token">Simbol Token</FieldLabel>
+                  <FieldLabel htmlFor="symbol-token">Token Symbol</FieldLabel>
                   <Input
                     id="symbol-token"
-                    placeholder="Misal: TKS"
+                    placeholder="MAT"
                     value={token.symbol}
                     onChange={(e) => handleFormChange('symbol', e.target.value.toUpperCase())}
                     required
@@ -352,13 +348,13 @@ export default function CreateToken() {
 
                 {/* Decimals */}
                 <Field>
-                  <FieldLabel>Desimal Token</FieldLabel>
+                  <FieldLabel>Token Decimals</FieldLabel>
                   <Select
                     value={token.decimals}
                     onValueChange={(value) => handleFormChange('decimals', value)}
                   >
                     <SelectTrigger className="w-full h-11 bg-muted/50 border-white/10 focus:border-purple-500/50">
-                      <SelectValue placeholder="Pilih desimal" />
+                      <SelectValue placeholder="Select decimals" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
@@ -374,7 +370,7 @@ export default function CreateToken() {
 
                 {/* Supply */}
                 <Field>
-                  <FieldLabel htmlFor="supply-token">Jumlah Supply</FieldLabel>
+                  <FieldLabel htmlFor="supply-token">Token Supply</FieldLabel>
                   <Input
                     id="supply-token"
                     type="number"
@@ -388,10 +384,10 @@ export default function CreateToken() {
 
                 {/* Description */}
                 <Field>
-                  <FieldLabel htmlFor="description-token">Deskripsi</FieldLabel>
+                  <FieldLabel htmlFor="description-token">Description</FieldLabel>
                   <Textarea
                     id="description-token"
-                    placeholder="Deskripsikan token Anda"
+                    placeholder="Describe your token"
                     value={token.description}
                     onChange={(e) => handleFormChange('description', e.target.value)}
                     rows={3}
@@ -401,7 +397,7 @@ export default function CreateToken() {
 
                 {/* Image Upload */}
                 <Field>
-                  <FieldLabel>Gambar Token</FieldLabel>
+                  <FieldLabel>Token Image</FieldLabel>
                   <div className="flex items-center gap-4">
                     <div className="relative">
                       <input
@@ -425,9 +421,9 @@ export default function CreateToken() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm text-muted-foreground">
-                        Upload logo untuk token Anda. PNG, JPG atau SVG.
+                        Upload a logo for your token. PNG, JPG or SVG.
                       </p>
-                      <p className="text-xs text-muted-foreground/60">Maks 2MB</p>
+                      <p className="text-xs text-muted-foreground/60">Max 2MB</p>
                     </div>
                   </div>
                 </Field>
@@ -439,13 +435,13 @@ export default function CreateToken() {
                   <AlertCircle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm text-yellow-500">
-                      Pastikan Anda memiliki cukup SOL untuk biaya transaksi di <strong>{network}</strong>.
+                      Make sure you have enough SOL to cover the transaction fees on <strong>{network}</strong>.
                     </p>
                     <Link
                       href="/airdrop"
                       className="text-sm text-purple-400 hover:underline inline-flex items-center gap-1"
                     >
-                      {isDevnet ? 'Dapatkan SOL Devnet lagi →' : 'Dapatkan SOL Devnet →'}
+                      {isDevnet ? 'Get more Devnet SOL →' : 'Get Devnet SOL →'}
                     </Link>
                   </div>
                 </div>
@@ -459,23 +455,23 @@ export default function CreateToken() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Membuat Token...
+                      Creating Token...
                     </>
                   ) : (
-                    'Buat Token'
+                    'Create Token'
                   )}
                 </Button>
 
-                {/* HASIL DENGAN EXPLORER LINK */}
+                {/* 🔥 HASIL DENGAN EXPLORER LINK */}
                 {tokenMintAddress && (
                   <div className="rounded-lg border border-green-500/20 bg-green-500/10 p-4 space-y-3 animate-in fade-in slide-in-from-bottom-2">
                     <p className="text-sm text-green-500 font-medium flex items-center gap-2">
                       <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                      Token berhasil dibuat!
+                      Token created successfully!
                     </p>
                     
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Alamat Mint</p>
+                      <p className="text-xs text-muted-foreground">Mint Address</p>
                       <div className="flex items-center gap-2 bg-background/50 rounded-lg p-2.5 border border-white/5">
                         <code className="text-xs font-mono flex-1 break-all text-foreground">
                           {tokenMintAddress}
@@ -483,7 +479,7 @@ export default function CreateToken() {
                         <button
                           onClick={copyAddress}
                           className="p-1.5 rounded hover:bg-muted transition-colors flex-shrink-0"
-                          title="Salin alamat"
+                          title="Copy address"
                         >
                           {copied ? (
                             <Check className="h-4 w-4 text-green-500" />
@@ -495,6 +491,7 @@ export default function CreateToken() {
                     </div>
 
                     <div className="flex flex-wrap gap-2 pt-1">
+                      {/* ✅ PAKE getExplorerUrl DARI UTILS */}
                       <a
                         href={getExplorerLink(tokenMintAddress)}
                         target="_blank"
@@ -502,7 +499,7 @@ export default function CreateToken() {
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 transition-colors"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
-                        Lihat di Explorer
+                        View on Explorer
                       </a>
                       <a
                         href={`https://solscan.io/token/${tokenMintAddress}${network !== 'mainnet-beta' ? `?cluster=${network}` : ''}`}
@@ -511,7 +508,7 @@ export default function CreateToken() {
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
-                        Lihat di Solscan
+                        View on Solscan
                       </a>
                     </div>
                   </div>
@@ -522,7 +519,7 @@ export default function CreateToken() {
         </form>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          Dibuat dengan ❤️ di Solana {network}
+          Built with ❤️ on Solana {network}
         </p>
       </div>
     </div>

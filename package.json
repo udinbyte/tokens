@@ -4,16 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "pnpm add react-icons && next build --turbopack",
+    "build": "pnpm remove @metaplex-foundation/mpl-token-metadata && pnpm add react-icons metaplex-foundation/mpl-token-metadata@2.3.3 && next build --turbopack",
     "start": "next start"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@formspree/react": "^3.0.0",
     "@heroicons/react": "^2.2.0",
-    "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
+    "@metaplex-foundation/mpl-token-metadata": "^2.3.3",
     "@shadcn/react": "^0.2.1",
-    "@solana/spl-token": "^0.4.15",
+    "@solana/spl-token": "^0.3.5",
     "@solana/wallet-adapter-base": "^0.9.27",
     "@solana/wallet-adapter-react": "^0.15.39",
     "@solana/wallet-adapter-react-ui": "^0.9.39",
