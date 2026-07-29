@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { useNetwork } from '@/app/providers/NetworkProvider';
 import useBalanceStore from '@/stores/balanceStore';
-import { Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
-import { getAccount } from '@solana/spl-token';
+import { PublicKey } from '@solana/web3.js';
+import { getAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { 
   Wallet as WalletIcon, 
   Copy, 
@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getExplorerUrl } from '@/utils/explorer';
-import { notifySuccess, notifyError } from '@/utils/notifications';
 import Link from 'next/link';
 
 interface TokenAccount {
@@ -56,14 +55,14 @@ export default function WalletPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activeTab, setActiveTab] = useState<'assets' | 'history'>('assets');
 
-  // Fetch token accounts
+  // ✅ Fetch token accounts - PAKE TOKEN_PROGRAM_ID
   const fetchTokenAccounts = async () => {
     if (!publicKey) return;
     
     setTokensLoading(true);
     try {
       const tokenAccounts = await connection.getTokenAccountsByOwner(publicKey, {
-        programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'),
+        programId: TOKEN_PROGRAM_ID,
       });
       
       const accounts: TokenAccount[] = [];
@@ -72,12 +71,13 @@ export default function WalletPage() {
         try {
           const accountData = await getAccount(connection, accountInfo.pubkey);
           const mint = accountData.mint.toString();
-          const balance = Number(accountData.amount) / Math.pow(10, accountData.decimals);
+          const amount = Number(accountData.amount);
+          const decimals = accountData.decimals;
           
           accounts.push({
             mint,
-            balance,
-            decimals: accountData.decimals,
+            balance: amount / Math.pow(10, decimals),
+            decimals: decimals,
           });
         } catch (error) {
           console.error('Error parsing token account:', error);
