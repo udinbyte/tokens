@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { 
   Keypair,
@@ -51,17 +51,17 @@ import { Loader2, Upload, AlertCircle, Coins, Copy, ExternalLink, Check, Info } 
 import Link from 'next/link';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 
-// Opsi decimals dengan penjelasan bahasa Indonesia
+// 🔥 DECIMALS OPTIONS - VALUE HARUS STRING!
 const decimalsOptions = [
-  { label: '0 - Tidak bisa dipecah (NFT / Soulbound)', value: 0 },
-  { label: '2 - Dasar (Gaya Rupiah/Sen)', value: 2 },
-  { label: '6 - Stablecoin (Gaya USDC/USDT)', value: 6 },
-  { label: '9 - Standar (Gaya SOL) ✅ Direkomendasikan', value: 9 },
-  { label: '12 - Presisi tinggi (Token DeFi) ⚠️ Supply terbatas', value: 12 },
+  { label: '0 - Tidak bisa dipecah (NFT / Soulbound)', value: '0' },
+  { label: '2 - Dasar (Gaya Rupiah/Sen)', value: '2' },
+  { label: '6 - Stablecoin (Gaya USDC/USDT)', value: '6' },
+  { label: '9 - Standar (Gaya SOL) ✅ Direkomendasikan', value: '9' },
+  { label: '12 - Presisi tinggi (Token DeFi) ⚠️ Supply terbatas', value: '12' },
 ];
 
-const PINATA_CLOUD_API="e736843165cc7bde50e";
-const PINATA_CLOUD_API_SECRET="34776c6523d2b7c6cabe3659afed87b0072a075759df9b0af7553a4b4da93ca8";
+// 🔥 PINATA JWT TOKEN
+const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI4ZjAxNTc4ZS0wMDFiLTRkZGYtOTZlYi02NDM4Yzc3NzQ3YWUiLCJlbWFpbCI6ImdhbWVzcnVubmVyMjA3MEBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiZTczNjg0MzE2NWNjN2JkZTUwZWYiLCJzY29wZWRLZXlTZWNyZXQiOiIzNDc3NmM2NTIzZDJiN2M2Y2FiZTM2NTlhZmVkODdiMDA3MmEwNzU3NTlkZjliMGFmNzU1M2E0YjRkYTkzY2E4IiwiZXhwIjoxODE2ODI0NTU3fQ.FMemBEWwZW7q12U5j2J07UKlQ6XQMipoRozM3S3Ha28"; // GANTI DENGAN JWT TOKEN DARI PINATA
 
 export default function CreateToken() {
   const { network } = useNetwork();
@@ -73,6 +73,10 @@ export default function CreateToken() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [showDecimalsInfo, setShowDecimalsInfo] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [calculatedAmount, setCalculatedAmount] = useState<string>('');
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [token, setToken] = useState({
     name: '',
@@ -83,12 +87,24 @@ export default function CreateToken() {
     description: ''
   });
   
-  // Handle form change dengan null safety
-  const handleFormChange = (fieldName: string, value: string | null) => {
-    setToken({ ...token, [fieldName]: value || '' });
+  const handleFormChange = (fieldName: string, value: string) => {
+    setToken(prev => ({ ...prev, [fieldName]: value }));
   };
   
-  // Upload gambar ke Pinata
+  // 🔥 CALCULATE SUPPLY - Otomatis hitung total unit dasar
+  useEffect(() => {
+    const decimals = Number(token.decimals) || 9;
+    const amount = Number(token.amount) || 0;
+    
+    if (amount > 0) {
+      const totalUnits = amount * Math.pow(10, decimals);
+      setCalculatedAmount(totalUnits.toLocaleString());
+    } else {
+      setCalculatedAmount('');
+    }
+  }, [token.decimals, token.amount]);
+  
+  // Upload image ke Pinata
   const uploadImagePinata = async (file: File) => {
     if (!file) return null;
     
@@ -101,16 +117,16 @@ export default function CreateToken() {
         url: 'https://api.pinata.cloud/pinning/pinFileToIPFS',
         data: formData,
         headers: {
-          pinata_api_key: PINATA_CLOUD_API ,
-          pinata_secret_api_key: PINATA_CLOUD_API_SECRET,
+          'Authorization': `Bearer ${PINATA_JWT}`,
           'Content-Type': 'multipart/form-data'
         }
       });
       
       return `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading image:', error);
-      notifyError('Gagal upload gambar', 'Silakan coba lagi');
+      console.error('Response:', error.response?.data);
+      notifyError('Gagal upload gambar', error.response?.data?.error || 'Silakan coba lagi');
       return null;
     }
   };
@@ -132,35 +148,32 @@ export default function CreateToken() {
         url: 'https://api.pinata.cloud/pinning/pinJSONToIPFS',
         data: JSON.stringify({ name, symbol, image, description }),
         headers: {
-          pinata_api_key: PINATA_CLOUD_API,
-          pinata_secret_api_key:  PINATA_CLOUD_API_SECRET,
+          'Authorization': `Bearer ${PINATA_JWT}`,
           'Content-Type': 'application/json'
         }
       });
       
       return `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading metadata:', error);
-      notifyError('Gagal upload metadata ke Pinata');
+      console.error('Response:', error.response?.data);
+      notifyError('Gagal upload metadata', error.response?.data?.error || 'Silakan coba lagi');
       return null;
     } finally {
       setIsLoading(false);
     }
   };
   
-  // Dapatkan link explorer
   const getExplorerLink = (address: string) => {
     return getExplorerUrl(network, address, 'address');
   };
   
-  // Copy address
   const copyAddress = async () => {
     await navigator.clipboard.writeText(tokenMintAddress);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
   
-  // Buat token
   const createToken = useCallback(async () => {
     if (!publicKey) {
       notifyError('Dompet tidak terhubung', 'Silakan sambungkan dompet Anda terlebih dahulu');
@@ -169,8 +182,29 @@ export default function CreateToken() {
 
     const { name, symbol, decimals, amount, image, description } = token;
     
-    if (!name || !symbol || !decimals || !amount || !image || !description) {
-      notifyWarning('Harap isi semua data token!');
+    // 🔥 VALIDASI LENGKAP
+    if (!name || name.trim() === '') {
+      notifyWarning('Harap isi Nama Token!');
+      return;
+    }
+    if (!symbol || symbol.trim() === '') {
+      notifyWarning('Harap isi Simbol Token!');
+      return;
+    }
+    if (!decimals) {
+      notifyWarning('Harap pilih Desimal Token!');
+      return;
+    }
+    if (!amount || amount === '0' || amount === '') {
+      notifyWarning('Harap isi Total Supply!');
+      return;
+    }
+    if (!image) {
+      notifyWarning('Harap upload Gambar Token!');
+      return;
+    }
+    if (!description || description.trim() === '') {
+      notifyWarning('Harap isi Deskripsi Token!');
       return;
     }
 
@@ -213,6 +247,9 @@ export default function CreateToken() {
         }
       });
       
+      // 🔥 HITUNG TOTAL UNIT DASAR
+      const totalUnits = Number(amount) * Math.pow(10, Number(decimals));
+      
       const transaction = new Transaction().add(
         SystemProgram.createAccount({
           fromPubkey: publicKey,
@@ -238,7 +275,7 @@ export default function CreateToken() {
           mintKeypair.publicKey,
           tokenATA,
           publicKey,
-          Number(amount) * Math.pow(10, Number(decimals))
+          totalUnits // 🔥 PAKE TOTAL UNIT
         ),
         createMetadataInstruction
       );
@@ -265,6 +302,10 @@ export default function CreateToken() {
         description: ''
       });
       setImagePreview(null);
+      setCalculatedAmount('');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       
     } catch (error: any) {
       console.error('Error creating token:', error);
@@ -278,25 +319,51 @@ export default function CreateToken() {
     const file = event.target.files?.[0];
     if (!file) return;
     
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+    // 🔥 VALIDASI UKURAN FILE (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      notifyError('File terlalu besar!', 'Maksimal ukuran gambar adalah 10MB');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
     
-    const imgUrl = await uploadImagePinata(file);
-    if (imgUrl) {
-      setToken({ ...token, image: imgUrl });
+    setIsUploadingImage(true);
+    
+    try {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      
+      const imgUrl = await uploadImagePinata(file);
+      if (imgUrl) {
+        setToken(prev => ({ ...prev, image: imgUrl }));
+        notifySuccess('Gambar berhasil diupload!');
+      } else {
+        setImagePreview(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }
+    } catch (error) {
+      console.error('Error handling image:', error);
+      setImagePreview(null);
+    } finally {
+      setIsUploadingImage(false);
     }
   };
   
   const isDevnet = network === WalletAdapterNetwork.Devnet;
 
-  // Cek apakah decimals > 9 untuk kasih warning
-  const selectedDecimals = Number(token.decimals);
+  const selectedDecimals = Number(token.decimals) || 9;
   const maxSupply = Math.floor(2**64 / 10**selectedDecimals);
   const isHighDecimals = selectedDecimals > 9;
   const isDangerDecimals = selectedDecimals > 12;
+  const amountNum = Number(token.amount) || 0;
+  const totalUnits = amountNum * Math.pow(10, selectedDecimals);
+  const isOverflow = totalUnits > Number.MAX_SAFE_INTEGER;
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-background">
@@ -383,8 +450,6 @@ export default function CreateToken() {
                         • <strong>6</strong> = Untuk stablecoin (seperti USDC)
                         <br />
                         • <strong>0</strong> = Untuk NFT / token yang tidak bisa dipecah
-                        <br />
-                        • <strong>&gt;9</strong> = ⚠️ Membatasi total supply maksimum!
                       </p>
                     </div>
                   )}
@@ -399,61 +464,13 @@ export default function CreateToken() {
                     <SelectContent>
                       <SelectGroup>
                         {decimalsOptions.map((item) => (
-                          <SelectItem key={item.value} value={String(item.value)}>
+                          <SelectItem key={item.value} value={item.value}>
                             {item.label}
                           </SelectItem>
                         ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-
-                  {/* Warning untuk decimals tinggi */}
-                  {isHighDecimals && !isDangerDecimals && (
-                    <div className="mt-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                      <p className="text-yellow-500 text-sm">
-                        ⚠️ Dengan {selectedDecimals} desimal, maksimum total supply adalah{' '}
-                        <strong>{maxSupply.toLocaleString()}</strong> token
-                      </p>
-                      <p className="text-yellow-500/80 text-xs mt-1">
-                        Pastikan supply yang Anda rencanakan di bawah batas ini!
-                      </p>
-                    </div>
-                  )}
-
-                  {isDangerDecimals && (
-                    <div className="mt-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                      <p className="text-red-500 text-sm font-medium">
-                        🚨 PERINGATAN! {selectedDecimals} desimal terlalu tinggi!
-                      </p>
-                      <p className="text-red-500/80 text-xs mt-1">
-                        Maksimum supply hanya <strong>{maxSupply.toLocaleString()}</strong> token.
-                        {selectedDecimals >= 18 && ' Dengan 18 desimal, Anda hanya bisa membuat ~18 token!'}
-                      </p>
-                      <p className="text-red-500/80 text-xs mt-1">
-                        💡 Gunakan 9 desimal (standar) untuk hasil terbaik.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Preview */}
-                  <div className="mt-2 p-3 bg-muted/30 border border-white/5 rounded-lg">
-                    <p className="text-xs text-muted-foreground">
-                      🔍 Dengan {selectedDecimals} desimal:
-                      <br />
-                      1 token = <strong>{(10 ** selectedDecimals).toLocaleString()}</strong> unit dasar
-                      {selectedDecimals > 9 && ' ⚠️ (besar!)'}
-                    </p>
-                    {token.amount && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Total unit dasar: <strong>
-                          {(Number(token.amount) * 10 ** selectedDecimals).toLocaleString()}
-                        </strong>
-                        {Number(token.amount) * 10 ** selectedDecimals > Number.MAX_SAFE_INTEGER && 
-                          ' 🚨 MELEBIHI BATAS!'
-                        }
-                      </p>
-                    )}
-                  </div>
                 </Field>
 
                 {/* Supply */}
@@ -469,20 +486,45 @@ export default function CreateToken() {
                     min="1"
                     className="h-11 bg-muted/50 border-white/10 focus:border-purple-500/50"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Jumlah token yang akan dibuat (dalam satuan token, bukan unit dasar)
-                  </p>
+                  
+                  {/* 🔥 CALCULATE SUPPLY - TAMPILAN TOTAL UNIT */}
+                  {token.amount && Number(token.amount) > 0 && (
+                    <div className="mt-2 p-3 bg-muted/30 border border-white/5 rounded-lg">
+                      <p className="text-xs text-muted-foreground">
+                        🔍 Detail Supply:
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 mt-1 text-sm">
+                        <div>
+                          <span className="text-xs text-muted-foreground">Jumlah Token:</span>
+                          <p className="font-medium">{Number(token.amount).toLocaleString()}</p>
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground">Unit Dasar:</span>
+                          <p className="font-medium">
+                            {totalUnits > 0 ? totalUnits.toLocaleString() : '0'}
+                            {isOverflow && (
+                              <span className="text-red-500 text-xs ml-1">⚠️ Terlalu besar!</span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground/60 mt-1">
+                        Total token × 10^desimal = unit dasar yang akan di-mint
+                      </p>
+                    </div>
+                  )}
                 </Field>
 
                 {/* Deskripsi */}
                 <Field>
-                  <FieldLabel htmlFor="description-token">Deskripsi</FieldLabel>
+                  <FieldLabel htmlFor="description-token">Deskripsi *</FieldLabel>
                   <Textarea
                     id="description-token"
                     placeholder="Jelaskan token Anda..."
                     value={token.description}
                     onChange={(e) => handleFormChange('description', e.target.value)}
                     rows={3}
+                    required
                     className="resize-none bg-muted/50 border-white/10 focus:border-purple-500/50"
                   />
                 </Field>
@@ -493,11 +535,12 @@ export default function CreateToken() {
                   <div className="flex items-center gap-4">
                     <div className="relative">
                       <input
+                        ref={fileInputRef}
                         type="file"
                         accept="image/*"
                         onChange={handleImageChange}
                         className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                        disabled={isLoading}
+                        disabled={isLoading || isUploadingImage}
                       />
                       <div className="flex h-24 w-24 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
                         {imagePreview ? (
@@ -515,7 +558,16 @@ export default function CreateToken() {
                       <p className="text-sm text-muted-foreground">
                         Upload logo untuk token Anda. PNG, JPG atau SVG.
                       </p>
-                      <p className="text-xs text-muted-foreground/60">Maksimal 2MB</p>
+                      <p className="text-xs text-muted-foreground/60">Maksimal 10MB</p>
+                      {isUploadingImage && (
+                        <div className="flex items-center gap-2 mt-2">
+                          <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
+                          <span className="text-xs text-muted-foreground">Uploading...</span>
+                        </div>
+                      )}
+                      {token.image && (
+                        <p className="text-xs text-green-500 mt-1">✅ Gambar terupload</p>
+                      )}
                     </div>
                   </div>
                 </Field>
@@ -541,7 +593,7 @@ export default function CreateToken() {
                 {/* Tombol Submit */}
                 <Button
                   type="submit"
-                  disabled={isLoading || !publicKey}
+                  disabled={isLoading || !publicKey || isUploadingImage || isOverflow}
                   className="w-full h-11 bg-gradient-to-r from-purple-400 to-blue-500 hover:from-purple-500 hover:to-blue-600 text-base shadow-lg shadow-purple-500/25"
                 >
                   {isLoading ? (
@@ -549,8 +601,13 @@ export default function CreateToken() {
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       Membuat Token...
                     </>
+                  ) : isUploadingImage ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Upload Gambar...
+                    </>
                   ) : (
-                    'Buat Token'
+                    `Buat Token (${token.amount || '0'} ${token.symbol || 'Token'})`
                   )}
                 </Button>
 
@@ -559,7 +616,7 @@ export default function CreateToken() {
                   <div className="rounded-lg border border-green-500/20 bg-green-500/10 p-4 space-y-3 animate-in fade-in slide-in-from-bottom-2">
                     <p className="text-sm text-green-500 font-medium flex items-center gap-2">
                       <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                       Token berhasil dibuat!
+                      Token berhasil dibuat!
                     </p>
                     
                     <div className="space-y-1">
