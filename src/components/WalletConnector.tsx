@@ -33,9 +33,10 @@ export default function WalletConnector({ className }: { className?: string }) {
         onClick={() => setVisible(true)}
         className={cn(
           'h-10 rounded-lg bg-gradient-to-r from-purple-400 to-blue-500 hover:from-purple-500 hover:to-blue-600 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40',
-          'md:w-auto w-full',
+          
           className
         )}
+
       >
         <Wallet className="h-4 w-4" />
         Connect Wallet

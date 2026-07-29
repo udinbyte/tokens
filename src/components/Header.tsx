@@ -29,7 +29,7 @@ export default function Header() {
 
   const navItems: NavItem[] = [
     { href: '/', label: 'Home', icon: Home },
-    { href: '/create', label: 'Create Token', icon: Coins },
+    { href: '/create-token', label: 'Create Token', icon: Coins },
     { href: '/metadata', label: 'Metadata', icon: FileText },
     { href: '/transfer', label: 'Transfer', icon: Send },
   ];

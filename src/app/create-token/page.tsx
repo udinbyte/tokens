@@ -60,6 +60,9 @@ const decimalsOptions = [
   { label: '12 - Presisi tinggi (Token DeFi) ⚠️ Supply terbatas', value: 12 },
 ];
 
+const PINATA_CLOUD_API="e736843165cc7bde50e";
+const PINATA_CLOUD_API_SECRET="34776c6523d2b7c6cabe3659afed87b0072a075759df9b0af7553a4b4da93ca8";
+
 export default function CreateToken() {
   const { network } = useNetwork();
   const { connection } = useConnection();
@@ -80,7 +83,7 @@ export default function CreateToken() {
     description: ''
   });
   
-  // Handle form change - sudah fix untuk menerima string | null
+  // Handle form change dengan null safety
   const handleFormChange = (fieldName: string, value: string | null) => {
     setToken({ ...token, [fieldName]: value || '' });
   };
@@ -98,8 +101,8 @@ export default function CreateToken() {
         url: 'https://api.pinata.cloud/pinning/pinFileToIPFS',
         data: formData,
         headers: {
-          pinata_api_key: process.env.NEXT_PUBLIC_PINATA_API_KEY || '',
-          pinata_secret_api_key: process.env.NEXT_PUBLIC_PINATA_SECRET_KEY || '',
+          pinata_api_key: PINATA_CLOUD_API ,
+          pinata_secret_api_key: PINATA_CLOUD_API_SECRET,
           'Content-Type': 'multipart/form-data'
         }
       });
@@ -129,8 +132,8 @@ export default function CreateToken() {
         url: 'https://api.pinata.cloud/pinning/pinJSONToIPFS',
         data: JSON.stringify({ name, symbol, image, description }),
         headers: {
-          pinata_api_key: process.env.NEXT_PUBLIC_PINATA_API_KEY || '',
-          pinata_secret_api_key: process.env.NEXT_PUBLIC_PINATA_SECRET_KEY || '',
+          pinata_api_key: PINATA_CLOUD_API,
+          pinata_secret_api_key:  PINATA_CLOUD_API_SECRET,
           'Content-Type': 'application/json'
         }
       });
@@ -356,7 +359,7 @@ export default function CreateToken() {
                   <p className="text-xs text-muted-foreground mt-1">Maksimal 10 karakter</p>
                 </Field>
 
-                {/* Decimals - FIXED ✅ */}
+                {/* Decimals */}
                 <Field>
                   <div className="flex items-center gap-2">
                     <FieldLabel>Desimal Token *</FieldLabel>
@@ -547,7 +550,7 @@ export default function CreateToken() {
                       Membuat Token...
                     </>
                   ) : (
-                    '🚀 Buat Token'
+                    'Buat Token'
                   )}
                 </Button>
 
@@ -556,7 +559,7 @@ export default function CreateToken() {
                   <div className="rounded-lg border border-green-500/20 bg-green-500/10 p-4 space-y-3 animate-in fade-in slide-in-from-bottom-2">
                     <p className="text-sm text-green-500 font-medium flex items-center gap-2">
                       <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                      ✅ Token berhasil dibuat!
+                       Token berhasil dibuat!
                     </p>
                     
                     <div className="space-y-1">
