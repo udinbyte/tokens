@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'; // ✅ PAKE Metadata, BUKAN getMetadata
+import { 
+  Metadata,
+  PROGRAM_ID,
+} from '@metaplex-foundation/mpl-token-metadata';
 import { getMint } from '@solana/spl-token';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
@@ -76,10 +79,6 @@ export default function MetadataPage() {
     image: '',
   });
 
-  // 🔥 METADATA PROGRAM ID
-  const METADATA_PROGRAM_ID = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
-
-  // Fetch metadata from URI
   const fetchUriMetadata = async (uri: string) => {
     try {
       const response = await axios.get(uri);
@@ -98,7 +97,6 @@ export default function MetadataPage() {
     }
   };
 
-  // 🔥 FETCH METADATA PAKE METADATA CLASS
   const fetchMetadata = async () => {
     if (!mintAddress) {
       notifyWarning('Masukkan alamat mint token');
@@ -115,19 +113,23 @@ export default function MetadataPage() {
     try {
       const mint = new PublicKey(mintAddress);
       
-      // 🔥 PAKE Metadata.fromAccountAddress
       const metadataPDA = await Metadata.fromAccountAddress(connection, mint);
       
-      // Get token supply & decimals
       const mintInfo = await getMint(connection, mint);
       
+      const creators = metadataPDA.data.creators?.map((creator) => ({
+        address: creator.address.toString(),
+        verified: creator.verified,
+        share: creator.share,
+      })) || [];
+
       const metadataData: TokenMetadata = {
         mint: mintAddress,
         name: metadataPDA.data.name || 'N/A',
         symbol: metadataPDA.data.symbol || 'N/A',
         uri: metadataPDA.data.uri || 'N/A',
         sellerFeeBasisPoints: metadataPDA.data.sellerFeeBasisPoints || 0,
-        creators: metadataPDA.data.creators || [],
+        creators: creators,
         isMutable: metadataPDA.isMutable,
         primarySaleHappened: metadataPDA.data.primarySaleHappened,
         updateAuthority: metadataPDA.updateAuthority?.toString(),
@@ -140,12 +142,10 @@ export default function MetadataPage() {
         decimals: mintInfo.decimals,
       });
       
-      // Fetch URI metadata
       if (metadataData.uri && metadataData.uri !== 'N/A') {
         await fetchUriMetadata(metadataData.uri);
       }
       
-      // Set edit data
       setEditData({
         name: metadataData.name,
         symbol: metadataData.symbol,
@@ -163,14 +163,12 @@ export default function MetadataPage() {
     }
   };
 
-  // Refresh metadata
   const refreshMetadata = async () => {
     setRefreshing(true);
     await fetchMetadata();
     setRefreshing(false);
   };
 
-  // Update metadata (simulasi)
   const updateMetadata = async () => {
     if (!metadata?.isMutable) {
       notifyError('Tidak dapat diupdate', 'Token ini tidak mutable');
@@ -444,6 +442,7 @@ export default function MetadataPage() {
                     )}
                   </div>
                 ) : (
+                  // Edit Mode
                   <div className="space-y-4">
                     {!metadata.isMutable && (
                       <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 flex gap-2">
